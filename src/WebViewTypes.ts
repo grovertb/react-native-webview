@@ -256,7 +256,7 @@ export type OnShouldStartLoadWithRequest = (
 ) => boolean;
 
 export type OnLoadResource = (
-  event: LoadResource
+  event: LoadResourceRequest
 ) => boolean
 
 export interface CommonNativeWebViewProps extends ViewProps {
@@ -1038,7 +1038,7 @@ export interface WebViewSharedProps extends ViewProps {
   /**
    * Capture loadResource
    */
-  onLoadResource?: onLoadResource;
+  onLoadResource?: OnLoadResource;
 
   /**
    * Override the native component used to render the WebView. Enables a custom native

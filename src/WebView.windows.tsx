@@ -249,6 +249,7 @@ export default class WebView extends React.Component<WebViewSharedProps, State> 
         onMessage={this.onMessage}
         onScroll={this.props.onScroll}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+        onLoadResource={()=>{}}
         source={resolveAssetSource(this.props.source as ImageSourcePropType)}
         style={webViewStyles}
         {...nativeConfig.props}
