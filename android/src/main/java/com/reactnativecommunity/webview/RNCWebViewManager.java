@@ -69,6 +69,7 @@ import com.facebook.react.uimanager.events.ContentSizeChangeEvent;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.reactnativecommunity.webview.RNCWebViewModule.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState;
+import com.reactnativecommunity.webview.events.TopLoadResource;
 import com.reactnativecommunity.webview.events.TopLoadingErrorEvent;
 import com.reactnativecommunity.webview.events.TopHttpErrorEvent;
 import com.reactnativecommunity.webview.events.TopLoadingFinishEvent;
@@ -605,6 +606,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     export.put(ScrollEventType.getJSEventName(ScrollEventType.SCROLL), MapBuilder.of("registrationName", "onScroll"));
     export.put(TopHttpErrorEvent.EVENT_NAME, MapBuilder.of("registrationName", "onHttpError"));
     export.put(TopRenderProcessGoneEvent.EVENT_NAME, MapBuilder.of("registrationName", "onRenderProcessGone"));
+    export.put(TopLoadResource.EVENT_NAME, MapBuilder.of("registrationName", "onLoadResource"));
     return export;
   }
 
@@ -808,6 +810,17 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         new TopLoadingStartEvent(
           webView.getId(),
           createWebViewEvent(webView, url)));
+    }
+
+    @Override
+    public void onLoadResource(WebView view, String url) {
+      super.onLoadResource(view, url);
+      dispatchEvent(
+        view,
+        new TopLoadResource(
+          view.getId(),
+          createWebViewEvent(view, url))
+      );
     }
 
     @Override

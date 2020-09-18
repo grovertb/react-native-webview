@@ -17,8 +17,9 @@ import invariant from 'invariant';
 import {
   defaultOriginWhitelist,
   createOnShouldStartLoadWithRequest,
+  createOnLoadResource,
+  defaultRenderLoading, 
   defaultRenderError,
-  defaultRenderLoading,
 } from './WebViewShared';
 import {
   WebViewRenderProcessGoneEvent,
@@ -78,6 +79,8 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
   };
 
   onShouldStartLoadWithRequest: ReturnType<typeof createOnShouldStartLoadWithRequest> | null = null;
+
+  onLoadResource: ReturnType<typeof createOnLoadResource> | null = null;
 
   webViewRef = React.createRef<NativeWebViewAndroid>();
 
@@ -294,10 +297,27 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     }
   };
 
+  onLoadResourceCallback = (
+    shouldStart: boolean,
+    url: string,
+    lockIdentifier?: number,
+  ) => {
+    if (lockIdentifier) {
+      NativeModules.RNCWebView.onLoadResourceCallback(shouldStart, lockIdentifier);
+    } else if (shouldStart) {
+      UIManager.dispatchViewManagerCommand(
+        this.getWebViewHandle(),
+        this.getCommands().loadUrl,
+        [String(url)],
+      );
+    }
+  };
+
   render() {
     const {
       onMessage,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
+      onLoadResource: onLoadResourceProp,
       originWhitelist,
       renderError,
       renderLoading,
@@ -349,6 +369,12 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
       onShouldStartLoadWithRequestProp,
     );
 
+    this.onLoadResource = createOnLoadResource(
+      this.onLoadResourceCallback,
+      originWhitelist as readonly string[],
+      onLoadResourceProp,
+    ); 
+
     const webView = (
       <NativeWebView
         key="webViewKey"
@@ -363,6 +389,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
         onRenderProcessGone={this.onRenderProcessGone}
         onMessage={this.onMessage}
         onShouldStartLoadWithRequest={this.onShouldStartLoadWithRequest}
+        onLoadResource={this.onLoadResource}
         ref={this.webViewRef}
         // TODO: find a better way to type this.
         source={resolveAssetSource(source as ImageSourcePropType)}

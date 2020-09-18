@@ -4,6 +4,8 @@ import { Linking, View, ActivityIndicator, Text } from 'react-native';
 import {
   OnShouldStartLoadWithRequest,
   ShouldStartLoadRequestEvent,
+  OnLoadResource,
+  LoadResourceEvent
 } from './WebViewTypes';
 import styles from './WebView.styles';
 
@@ -62,6 +64,38 @@ const createOnShouldStartLoadWithRequest = (
   };
 };
 
+const createOnLoadResource = (
+  loadRequest: (
+    shouldStart: boolean,
+    url: string,
+    lockIdentifier: number,
+  ) => void,
+  originWhitelist: readonly string[],
+  onLoadResource?: OnLoadResource,
+) => {
+  return ({ nativeEvent }: LoadResourceEvent) => {
+    let shouldStart = true;
+    const { url, lockIdentifier } = nativeEvent;
+
+    if (!passesWhitelist(compileWhitelist(originWhitelist), url)) {
+      Linking.canOpenURL(url).then((supported) => {
+        if (supported) {
+          return Linking.openURL(url);
+        }
+        console.warn(`Can't open url: ${url}`);
+        return undefined;
+      }).catch(e => {
+        console.warn('Error opening URL: ', e);
+      });
+      shouldStart = false;
+    } else if (onLoadResource) {
+      shouldStart = onLoadResource(nativeEvent);
+    }
+
+    loadRequest(shouldStart, url, lockIdentifier);
+  };
+};
+
 const defaultRenderLoading = () => (
   <View style={styles.loadingOrErrorView}>
     <ActivityIndicator />
@@ -83,6 +117,7 @@ const defaultRenderError = (
 export {
   defaultOriginWhitelist,
   createOnShouldStartLoadWithRequest,
+  createOnLoadResource,
   defaultRenderLoading,
   defaultRenderError,
 };

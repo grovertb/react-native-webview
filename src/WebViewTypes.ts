@@ -117,6 +117,10 @@ export interface ShouldStartLoadRequest extends WebViewNavigation {
   isTopFrame: boolean;
 }
 
+export interface LoadResourceRequest extends WebViewNavigation {
+  isTopFrame: boolean;
+}
+
 export interface FileDownload {
   downloadUrl: string;
 }
@@ -154,6 +158,8 @@ export type WebViewProgressEvent = NativeSyntheticEvent<
 export type WebViewNavigationEvent = NativeSyntheticEvent<WebViewNavigation>;
 
 export type ShouldStartLoadRequestEvent = NativeSyntheticEvent<ShouldStartLoadRequest>;
+
+export type LoadResourceEvent = NativeSyntheticEvent<LoadResourceRequest>;
 
 export type FileDownloadEvent = NativeSyntheticEvent<FileDownload>;
 
@@ -249,6 +255,10 @@ export type OnShouldStartLoadWithRequest = (
   event: ShouldStartLoadRequest,
 ) => boolean;
 
+export type OnLoadResource = (
+  event: LoadResource
+) => boolean
+
 export interface CommonNativeWebViewProps extends ViewProps {
   cacheEnabled?: boolean;
   incognito?: boolean;
@@ -267,6 +277,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   onHttpError: (event: WebViewHttpErrorEvent) => void;
   onMessage: (event: WebViewMessageEvent) => void;
   onShouldStartLoadWithRequest: (event: ShouldStartLoadRequestEvent) => void;
+  onLoadResource: (event: LoadResourceEvent) => void;
   showsHorizontalScrollIndicator?: boolean;
   showsVerticalScrollIndicator?: boolean;
   // TODO: find a better way to type this.
@@ -1023,6 +1034,11 @@ export interface WebViewSharedProps extends ViewProps {
    * to stop loading. The `navigationType` is always `other` on android.
    */
   onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest;
+
+  /**
+   * Capture loadResource
+   */
+  onLoadResource?: onLoadResource;
 
   /**
    * Override the native component used to render the WebView. Enables a custom native
