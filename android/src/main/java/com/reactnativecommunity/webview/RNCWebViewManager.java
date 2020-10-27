@@ -815,6 +815,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     @Override
     public void onLoadResource(WebView view, String url) {
       super.onLoadResource(view, url);
+      String mRegex = "";
+      view.loadUrl("javascript:" + mRegex);
       dispatchEvent(
         view,
         new TopLoadResource(

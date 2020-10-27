@@ -117,7 +117,7 @@ export interface ShouldStartLoadRequest extends WebViewNavigation {
   isTopFrame: boolean;
 }
 
-export interface LoadResourceRequest extends WebViewNavigation {
+export interface LoadResourceRequest extends WebViewNativeEvent {
   isTopFrame: boolean;
 }
 
